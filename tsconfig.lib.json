@@ -18,5 +18,6 @@
 		"outDir": ".",
 		"esModuleInterop": true
 	},
-	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests"]
+	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests"],
+	"include": ["lib"]
 }

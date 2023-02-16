@@ -18,5 +18,6 @@
 		"outDir": ".",
 		"esModuleInterop": true
 	},
-	"include": ["lib/*", "lib/**/*", "example", "tests", "types"]
+	"exclude": ["index.d.ts", "index.js", "types.d.ts", "types.js"],
+	"include": ["."]
 }
