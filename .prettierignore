@@ -1,0 +1,15 @@
+# Ignore everything:
+/*
+/__snapshots__/*
+*.ts.snap
+
+# Except:
+!/lib
+!/example
+!/tests
+!jest.config.ts
+!package.json
+!tsconfig.json
+!tsconfig.lib.json
+!webpack.config.ts
+

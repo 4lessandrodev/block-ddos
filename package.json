@@ -1,0 +1,69 @@
+{
+	"name": "block-ddos",
+	"version": "0.0.1",
+	"description": "This package provide a middleware to block multiple request",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"license": "MIT",
+	"author": "Alessandro Dev",
+	"contributors": [],
+	"engines": {
+		"node": ">=16.x <19"
+	},
+	"keywords": [
+		"DDoS",
+		"Block Request",
+		"Middleware"
+	],
+	"scripts": {
+		"prebuild": "rimraf ./dist && npm run check:circular-deps",
+		"build": "tsc -p tsconfig.lib.json",
+		"test:dev": "jest --silent --runInBand",
+		"test:cov": "jest --silent --runInBand --coverage",
+		"test": "jest --silent --runInBand --forceExit",
+		"test:verbose": "jest --runInBand",
+		"check:circular-deps": "madge --circular --extensions ts ./lib",
+		"prepublish:lib": "rimraf ./dist && npm run check:circular-deps",
+		"publish:lib": "npm publish",
+		"format:all": "npx prettier --write .",
+		"check:types": "tsc -p ./tsconfig.lib.json --noEmit"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/4lessandrodev/block-ddos.git"
+	},
+	"bugs": {
+		"url": "https://github.com/4lessandrodev/block-ddos/issues"
+	},
+	"homepage": "https://github.com/4lessandrodev/block-ddos/tree/main/docs",
+	"dependencies": {},
+	"devDependencies": {
+		"@types/express": "^4.17.17",
+		"@types/jest": "^27.0.1",
+		"@types/node": "^18.11.18",
+		"jest": "^27.5.1",
+		"madge": "^6.0.0",
+		"prettier": "^2.8.1",
+		"rimraf": "^4.1.2",
+		"ts-jest": "^27.1.4",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.9.5"
+	},
+	"peerDependencies": {
+		"@types/express": "^4.17.17",
+		"express": "^4.17.17"
+	},
+	"files": [
+		"dist/*",
+		"package.json"
+	],
+	"lint-staged": {
+		"*": [
+			"npm run format:all",
+			"npx prettier --ignore-unknown --check"
+		],
+		"*.{ts,js}": [
+			"npm run check:circular-deps"
+		]
+	}
+}
