@@ -45,7 +45,7 @@ app.listen(3000);
 
 ## Single route
 
-Applying for a single route
+Applying for a single route.
 
 ```ts
 
@@ -66,7 +66,8 @@ app.listen(3000);
 
 ## Interval
 
-Determine the interval (ttl) to apply between multiple requests
+Determine the interval (ttl) to apply between multiple requests.
+The middleware is a singleton instance. Do not use different time interval for different routes. Keep the same time interval for all routes.
 
 ```ts
 
@@ -75,6 +76,21 @@ import { blockDDoS } from 'block-ddos';
 // 30 sec in milliseconds - default is 15 sec
 const interval = 30000;
 
-blockDDoS(interval);
+app.use(blockDDoS(interval));
+
+```
+
+## Customize message
+
+Change the message sent to user
+
+```ts
+
+import { blockDDoS } from 'block-ddos';
+
+const interval = 15000;
+const message = "Blocked by block-ddos middleware";
+
+app.use(blockDDoS(interval, message));
 
 ```

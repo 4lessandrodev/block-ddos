@@ -1,12 +1,13 @@
-import blockDDoS from "@block-ddos";
+import { blockDDoS } from "@block-ddos";
 import { NextFunction, Request, Response } from "express";
+import middleware from '../lib/core';
 
 describe('info', () => {
 
     const result = { data: {}, status: 400 };
 
     const request = { socket: { remoteAddress: '::1' }, path: '/index', method: 'GET' } as Request;
-    
+
     const response = {
         status: function (status: number) {
             return ({
@@ -14,13 +15,13 @@ describe('info', () => {
                     result.data = data;
                     result.status = status;
                 }
-            })
+            });
         }
     } as Response;
 
     const next = function () {
         result.status = 200;
-        result.data = { next: true }
+        result.data = { next: true };
     } satisfies NextFunction;
 
     const ResetMock = () => { result.data = {}; result.status = 200; };
@@ -37,5 +38,20 @@ describe('info', () => {
         const middleware = blockDDoS();
         middleware(request, response, next);
         expect(result).toEqual({ status: 403, data: { message: 'Blocked by proxy. Try again in a moment!' } });
+    });
+
+    it('should throws if provide a time as string', () => {
+        const fn = () => blockDDoS('9000' as any);
+        expect(fn).toThrowError('The time interval must be a number');
+    });
+
+    it('should throws if provide a time less than 5000ms', () => {
+        const fn = () => blockDDoS(4000);
+        expect(fn).toThrowError('The time interval must be greater than or equal to 5000ms');
+    });
+
+    it('should to be a function', () => {
+        const isFn = typeof middleware === 'function';
+        expect(isFn).toBeTruthy();
     });
 });
