@@ -15,12 +15,9 @@
 		"strict": true,
 		"lib": ["ES2017"],
 		"sourceMap": true,
-		"outDir": "./dist",
-		"esModuleInterop": true,
-		"baseUrl": "./",
-		"paths": {
-			"@block-ddos": ["lib/index"]
-		}
+		"outDir": ".",
+		"esModuleInterop": true
 	},
-	"include": ["lib/*", "lib/**/*", "example", "tests", "types"]
+	"exclude": ["index.d.ts", "index.js", "types.d.ts", "types.js"],
+	"include": ["."]
 }
