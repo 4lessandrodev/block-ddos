@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from "express";
 interface Data {
 	hash: string;
 	expiresAt: number;
-	createdAt: number;
 	ip: string;
 }
 
@@ -49,7 +48,7 @@ class Info implements Data {
 		const hash = `[${ip}][${request.method}][${request.path}]`;
 		const createdAt = Date.now();
 		const expiresAt = createdAt + ttl;
-		const data = { createdAt, expiresAt, hash, ip } satisfies Readonly<Data>;
+		const data = { expiresAt, hash, ip } satisfies Readonly<Data>;
 		return Object.freeze(data);
 	}
 
