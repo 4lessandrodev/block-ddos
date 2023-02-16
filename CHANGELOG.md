@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 ---
-### [3.5.1] - 2023-01-27
+### [0.0.1] - 2023-02-15
+
+### Feat
+
+- Feat: create beta version
 
 ---
