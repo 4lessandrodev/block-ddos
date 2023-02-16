@@ -1,5 +1,6 @@
-import blockDDoS from "@block-ddos";
+import { blockDDoS } from "@block-ddos";
 import { NextFunction, Request, Response } from "express";
+import middleware from '../lib/core';
 
 describe('info', () => {
 
@@ -47,5 +48,10 @@ describe('info', () => {
     it('should throws if provide a time less than 5000ms', () => {
         const fn = () => blockDDoS(4000);
         expect(fn).toThrowError('The time interval must be greater than or equal to 5000ms');
+    });
+
+    it('should to be a function', () => {
+        const isFn = typeof middleware === 'function';
+        expect(isFn).toBeTruthy();
     });
 });
