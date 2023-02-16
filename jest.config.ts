@@ -7,8 +7,5 @@ module.exports = {
 	testEnvironment: 'node',
 	transform: {
 		'.+\\.ts$': 'ts-jest',
-	},
-	moduleNameMapper: {
-		'@block-ddos': '<rootDir>/lib/index',
-	},
+	}
 };

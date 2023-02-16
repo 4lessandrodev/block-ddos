@@ -15,9 +15,8 @@
 		"strict": true,
 		"lib": ["ES2017"],
 		"sourceMap": false,
-		"outDir": "./dist",
+		"outDir": ".",
 		"esModuleInterop": true
 	},
-	"include": ["lib/*", "lib/**/*"],
 	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests"]
 }

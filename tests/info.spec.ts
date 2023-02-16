@@ -1,6 +1,6 @@
-import { blockDDoS } from "@block-ddos";
+import { blockDDoS } from "../lib";
 import { NextFunction, Request, Response } from "express";
-import middleware from '../lib/core';
+import middleware from '../lib';
 
 describe('info', () => {
 
