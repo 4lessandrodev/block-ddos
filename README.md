@@ -73,7 +73,7 @@ The middleware is a singleton instance. Do not use different time interval for d
 
 import { blockDDoS } from 'block-ddos';
 
-// 30 sec in milliseconds - default is 15 sec
+// 30 sec in milliseconds - default is 10 sec (10000ms), and minimum is 5 sec (5000ms)
 const interval = 30000;
 
 app.use(blockDDoS(interval));
