@@ -1,4 +1,4 @@
-import { Data, fnDDoS, Middleware, NextFunctions, Payload, Requests, Responses } from "./types";
+import { Data, fnDDoS, Middleware, NextFunctions, Params, Payload, Requests, Responses } from "./types";
 
 const defaultMsg = 'Blocked by proxy. Try again in a moment!';
 
@@ -10,8 +10,11 @@ class Info implements Data {
 	private constructor (
 		public hash: Readonly<string>,
 		public expiresAt: Readonly<number>,
-		public ip: Readonly<string>
-	) { }
+		public attempts: Readonly<number>,
+		public ttl: Readonly<number>,
+	) { 
+		Object.freeze(this);
+	}
 
 	/**
 	 * @description Get unique hash from request.
@@ -22,6 +25,16 @@ class Info implements Data {
 		const ip = this.GetIP(request);
 		const hash = `[${ip}][${request.method}][${request.path}]`;
 		return hash;
+	}
+
+	/**
+	 * @description Create a new instance with incremented attempts.
+	 * @returns instance of Data.
+	 */
+	public Increment(): Readonly<Data> {
+		const attempts = this.attempts + 1;
+		const expiresAt = Date.now() + this.ttl;
+		return new Info(this.hash, expiresAt, attempts, this.ttl) satisfies Readonly<Data>;
 	}
 
 	/**
@@ -36,8 +49,8 @@ class Info implements Data {
 		const hash = `[${ip}][${request.method}][${request.path}]`;
 		const createdAt = Date.now();
 		const expiresAt = createdAt + ttl;
-		const data = new Info(hash, expiresAt, ip) satisfies Readonly<Data>;
-		return Object.freeze(data);
+		const attempts = 1;
+		return new Info(hash, expiresAt, attempts, ttl) satisfies Readonly<Data>;
 	}
 
 	/**
@@ -60,10 +73,12 @@ class MemoryStore {
 	private timer: NodeJS.Timer | null;
 	private readonly interval: number;
 	private Db: Array<Readonly<Data>>;
+	private attempts: number;
 
-	private constructor () {
+	private constructor (attempts: number) {
 		this.Db = [];
 		this.interval = 5000;
+		this.attempts = attempts;
 		this.timer = null;
 		this.StartTimerCaseData();
 	}
@@ -73,9 +88,9 @@ class MemoryStore {
 	 * @param interval time in milliseconds to expires data in store.
 	 * @returns instance of MemoryStore.
 	 */
-	public static Create(): MemoryStore {
+	public static Create(attempts = 3): MemoryStore {
 		if (MemoryStore.instance) return MemoryStore.instance;
-		MemoryStore.instance = new MemoryStore();
+		MemoryStore.instance = new MemoryStore(attempts);
 		return MemoryStore.instance;
 	}
 
@@ -85,6 +100,12 @@ class MemoryStore {
 	 * @returns instance of MemoryStore.
 	 */
 	public Save(data: Readonly<Data>): MemoryStore {
+		const alreadyExists = this.Exists(data.hash);
+		if(alreadyExists){
+			this.Increment(data);
+			this.StartTimerCaseData();
+			return this;
+		}
 		this.Db.push(data);
 		this.StartTimerCaseData();
 		return this;
@@ -95,9 +116,41 @@ class MemoryStore {
 	 * @param hash string as `[ip][method][path]`
 	 * @returns true if exist store for hash and returns false if do not exists.
 	 */
-	public Exists(hash: string): boolean {
+	private Exists(hash: string): boolean {
 		const exists = this.GetByHash(hash);
 		return !!exists;
+	}
+
+	/**
+	 * @description 
+	 * @param data 
+	 */
+	private Increment(data: Readonly<Data>): void {
+		const res = data.Increment();
+		this.Db = this.Db.filter((dt): boolean => dt.hash !== data.hash);
+		this.Db.push(res);
+	}
+
+	/**
+	 * @description Check total attempts to a route.
+	 * @param data instance of Data.
+	 * @returns true if has the limit attempts and return false if do not.
+	 */
+	private HasMaxAttempts(data: Readonly<Data>): boolean {
+		return this.attempts <= data.attempts;
+	}
+
+	/**
+	 * @description Check if can user can access the route.
+	 * @param hash string as `[ip][method][path]`
+	 * @returns true if user can access the route and returns false if user do not.
+	 */
+	public CanAccess(hash: string): boolean {
+		const exists = this.GetByHash(hash);
+		if(!exists) return true;
+		const hasMaxAttempts = this.HasMaxAttempts(exists);		
+		if(hasMaxAttempts) return false;
+		return true;
 	}
 
 	/**
@@ -164,15 +217,16 @@ class MemoryStore {
  * @throws if provide interval as not a number
  * @throws if provide interval less than 5000ms or 5 sec
  */
-export const blockDDoS: fnDDoS = (interval = 10000, message = defaultMsg): Middleware => {
-	if (typeof interval !== 'number') throw new Error('The time interval must be a number');
-	if (interval < 5000) throw new Error('The time interval must be greater than or equal to 5000ms');
+export const blockDDoS: fnDDoS = (params?: Params): Middleware => {
+	if (params && params?.attempts && typeof params.attempts !== 'number') throw new Error('The attempts param must be a positive number');
+	if (params && params?.interval && typeof params.interval !== 'number') throw new Error('The time interval must be a number');
+	if (params && params?.interval && params.interval < 5000) throw new Error('The time interval must be greater than or equal to 5000ms');
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
-		const store = MemoryStore.Create();
-		const info = Info.Create(req, interval);
+		const store = MemoryStore.Create(params?.attempts);
+		const info = Info.Create(req, params?.interval);
 		const hash = Info.GetHash(req);
-		const blocked = store.Exists(hash);
-		if (blocked) return res.status(403).json({ message });
+		const canAccess = store.CanAccess(hash);
+		if (!canAccess) return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
 		store.Save(info);
 		return next();
 	};
