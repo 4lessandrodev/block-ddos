@@ -1,4 +1,4 @@
-import { Data, fnDDoS, Middleware, NextFunctions, Params, Payload, Requests, Responses } from "./types";
+import { Data, Middleware, NextFunctions, Params, Payload, Requests, Responses } from "./types";
 
 const defaultMsg = 'Blocked by proxy. Try again in a moment!';
 
@@ -88,7 +88,7 @@ class MemoryStore {
 	 * @param interval time in milliseconds to expires data in store.
 	 * @returns instance of MemoryStore.
 	 */
-	public static Create(attempts = 3): MemoryStore {
+	public static Create(attempts = 3): MemoryStore {		
 		if (MemoryStore.instance) return MemoryStore.instance;
 		MemoryStore.instance = new MemoryStore(attempts);
 		return MemoryStore.instance;
@@ -99,7 +99,7 @@ class MemoryStore {
 	 * @param data instance of Data
 	 * @returns instance of MemoryStore.
 	 */
-	public Save(data: Readonly<Data>): MemoryStore {
+	public Save(data: Readonly<Data>): MemoryStore {		
 		const alreadyExists = this.Exists(data.hash);
 		if(alreadyExists){
 			this.Increment(data);
@@ -122,13 +122,13 @@ class MemoryStore {
 	}
 
 	/**
-	 * @description 
-	 * @param data 
+	 * @description Increment attempts to info.
+	 * @param data instance of Data.
 	 */
 	private Increment(data: Readonly<Data>): void {
-		const res = data.Increment();
+		const lastInfo = this.GetByHash(data.hash);
 		this.Db = this.Db.filter((dt): boolean => dt.hash !== data.hash);
-		this.Db.push(res);
+		if(lastInfo) this.Db.push(lastInfo.Increment());
 	}
 
 	/**
@@ -207,20 +207,33 @@ class MemoryStore {
 }
 
 /**
- * @description Middleware to block multiple request to a same route for a same ip.
- * @param interval time to expires in milliseconds.
- * @param message error message as string.
- * @returns Middleware function.
- * 
- * @default interval `10000` = `10 sec`
- * @default message `Blocked by proxy. Try again in a moment!`
- * @throws if provide interval as not a number
- * @throws if provide interval less than 5000ms or 5 sec
+ * @description Validate params.
+ * @param params throws if some value is invalid.
  */
-export const blockDDoS: fnDDoS = (params?: Params): Middleware => {
+const ValidateParams = (params?: Params): void => {
 	if (params && params?.attempts && typeof params.attempts !== 'number') throw new Error('The attempts param must be a positive number');
 	if (params && params?.interval && typeof params.interval !== 'number') throw new Error('The time interval must be a number');
 	if (params && params?.interval && params.interval < 5000) throw new Error('The time interval must be greater than or equal to 5000ms');
+	if(typeof params?.attempts === 'number' && (params.attempts < 1 || params.attempts > 7)) throw new Error('The attempts param must be between 0 and 8') ;
+};
+
+/**
+ * @description Middleware to block multiple request to a same route from a same ip.
+ * @param param is Object:
+ * @param interval time interval between requests in milliseconds.
+ * @param error Object or String. data to be sent to user in response when error.
+ * @param attempts number of attempts allowed before blocking next request. 1 - 7.
+ * @returns Middleware function.
+ *
+ * @default interval `10000` = `10 sec`
+ * @default error { message: `Blocked by proxy. Try again in a moment!` }
+ * @default attempts 3
+ * @throws if provide interval as not a number
+ * @throws if provide interval less than 5000ms or 5 sec
+ * @throws if provide attempts less than 1 or greater than 7.
+ */
+export const blockDDoS = (params?: Params): Middleware => {
+	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
 		const store = MemoryStore.Create(params?.attempts);
 		const info = Info.Create(req, params?.interval);
