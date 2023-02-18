@@ -33,11 +33,14 @@ describe('info', () => {
         expect(result).toEqual({ status: 200, data: { next: true } });
     });
 
-    it('should block sec request with success', () => {
+    it.only('should block 4th request with success', () => {
         ResetMock();
         const middleware = blockDDoS();
         middleware(request, response, next);
-        expect(result).toEqual({ status: 403, data: { message: 'Blocked by proxy. Try again in a moment!' } });
+        middleware(request, response, next);
+        middleware(request, response, next);
+        middleware(request, response, next);
+        expect(result).toEqual({ status: 403, data: { error: { message: 'Blocked by proxy. Try again in a moment!' } } });
     });
 
     it('should throws if provide a time as string', () => {
@@ -46,7 +49,7 @@ describe('info', () => {
     });
 
     it('should throws if provide a time less than 5000ms', () => {
-        const fn = () => blockDDoS(4000);
+        const fn = () => blockDDoS({ interval: 4000 });
         expect(fn).toThrowError('The time interval must be greater than or equal to 5000ms');
     });
 

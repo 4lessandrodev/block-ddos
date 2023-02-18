@@ -18,6 +18,6 @@
 		"outDir": ".",
 		"esModuleInterop": true
 	},
-	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests"],
+	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests", "global-setup.ts", "jest.config.ts"],
 	"include": ["lib"]
 }
