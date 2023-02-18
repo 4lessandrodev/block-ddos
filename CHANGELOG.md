@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 ---
+### [0.1.0] - 2023-02-17
+
+### Changes
+
+- Breaking-change: change params from args `(arg1, arg2)` to object `{ ...args }`
+
+### Feat
+
+- Feat: implement attempts
+- Feat: implement custom error as object or string
+
+---
 
 ### [0.0.3] - 2023-02-16
 

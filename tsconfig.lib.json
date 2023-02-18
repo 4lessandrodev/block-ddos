@@ -2,22 +2,18 @@
 	"compilerOptions": {
 		"module": "CommonJS",
 		"declaration": true,
-		"noImplicitAny": false,
 		"removeComments": false,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"allowSyntheticDefaultImports": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
 		"skipDefaultLibCheck": true,
 		"skipLibCheck": true,
 		"target": "ES2017",
 		"strict": true,
 		"lib": ["ES2017"],
-		"sourceMap": false,
 		"outDir": ".",
 		"esModuleInterop": true
 	},
-	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests"],
+	"exclude": ["/**/*.spec.ts", "/*.spec.ts", "tests", "*/tests", "global-setup.ts", "jest.config.ts"],
 	"include": ["lib"]
 }
