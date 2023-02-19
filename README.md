@@ -73,7 +73,8 @@ The middleware is a singleton instance so different time interval for different 
 
 import { blockDDoS } from 'block-ddos';
 
-// 30 sec in milliseconds - default is 10 sec (10000ms), and minimum is 5 sec (5000ms)
+// 30 sec in milliseconds
+// default is 10 sec (10000ms), and minimum is 10 sec (10000ms)
 const interval = 30000;
 
 app.use(blockDDoS({ interval }));
@@ -104,9 +105,13 @@ You can allow user retry some request before block it. In this example the 3th r
 
 import { blockDDoS } from 'block-ddos';
 
-// attempts must be: 1 - 7. default is 3.
-const attempts = 2;
+// attempts must be: 1 - 7. default is 2.
+const attempts = 3;
 
 app.use(blockDDoS({ attempts }));
 
 ```
+
+## ban IP
+
+If the ip is blocked twenty (20) times for the same route in a 10 minutes interval, it will be banned for 10 minutes

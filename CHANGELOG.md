@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 ---
+
+### [0.1.1] - 2023-02-19
+### Fix
+
+- Fix: method to get user ip
+
+### Added
+
+- Added: behavior to ban ip when blocked for 7x in 10 minutes interval
+
+---
 ### [0.1.0] - 2023-02-17
 
 ### Changes

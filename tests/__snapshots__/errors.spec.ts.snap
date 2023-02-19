@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`custom errors should block by cookies 1`] = `
+Object {
+  "cookies": Object {
+    "ddos-blocked-times": 1,
+  },
+  "headers": Object {
+    "cookie": "ddos-blocked-times=21",
+    "x-forwarded-for": "77.11.107.51",
+  },
+  "hostname": "http://localhost",
+  "method": "GET",
+  "path": "/index",
+  "protocol": "http",
+}
+`;
+
+exports[`custom errors should block by secure cookies 1`] = `
+Object {
+  "cookies": Object {
+    "ddos-blocked-times": 1,
+  },
+  "headers": Object {
+    "cookie": "ddos-blocked-times=21",
+    "x-forwarded-for": "77.11.107.51",
+  },
+  "hostname": "http://localhost",
+  "method": "GET",
+  "path": "/index",
+  "protocol": "https",
+}
+`;
