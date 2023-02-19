@@ -22,7 +22,7 @@ describe('custom errors', () => {
 
     it('should block by cookies', () => {
         ResetMock();
-        const req = Object.assign({}, { ...request, cookies: { 'ddos-blocked-times': 7 } }, { headers: { 'x-forwarded-for': '77.11.107.51' } }) as unknown as Request;
+        const req = Object.assign({}, { ...request, headers: { ...request.headers, cookie: 'ddos-blocked-times=21', 'x-forwarded-for': '77.11.107.51' } }) as unknown as Request;
         const middleware = blockDDoS({ error: { msg: 'My custom error', isFail: true }, attempts: 1 });
         middleware(req, response, next);
         expect(result).toEqual({ data: { error: { isFail: true, msg: 'My custom error' } }, status: 403 });
@@ -31,7 +31,7 @@ describe('custom errors', () => {
 
     it('should block by secure cookies', () => {
         ResetMock();
-        const req = Object.assign({}, { ...request, cookies: { 'ddos-blocked-times': 9 }, protocol: 'https', }, { headers: { 'x-forwarded-for': '77.11.107.51' } }) as unknown as Request;
+        const req = Object.assign({}, { ...request, headers: { ...request.headers, cookie: 'ddos-blocked-times=21', 'x-forwarded-for': '77.11.107.51' }, protocol: 'https' }) as unknown as Request;
         const middleware = blockDDoS({ error: { msg: 'My custom error', isFail: true }, attempts: 1 });
         middleware(req, response, next);
         expect(result).toEqual({ data: { error: { isFail: true, msg: 'My custom error' } }, status: 403 });

@@ -237,8 +237,9 @@ const ValidateParams = (params?: Params): void => {
 export const blockDDoS = (params?: Params): Middleware => {
 	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
-		const maybeTotal = req.headers?.cookie?.split(';').find((a): boolean => a?.includes('ddos-blocked-times='))?.split("=")?.[1]
-		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 7) {
+		if(req?.path === '/favicon.ico') return next();
+		const maybeTotal = req.headers?.cookie?.split(';').find((c): boolean => c?.includes('ddos-blocked-times='))?.split("=")?.[1]
+		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 20) {
 			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
 		}
 		const store = MemoryStore.Create(params?.attempts);

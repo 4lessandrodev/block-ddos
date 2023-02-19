@@ -3,9 +3,10 @@
 exports[`custom errors should block by cookies 1`] = `
 Object {
   "cookies": Object {
-    "ddos-blocked-times": 7,
+    "ddos-blocked-times": 1,
   },
   "headers": Object {
+    "cookie": "ddos-blocked-times=21",
     "x-forwarded-for": "77.11.107.51",
   },
   "hostname": "http://localhost",
@@ -18,9 +19,10 @@ Object {
 exports[`custom errors should block by secure cookies 1`] = `
 Object {
   "cookies": Object {
-    "ddos-blocked-times": 9,
+    "ddos-blocked-times": 1,
   },
   "headers": Object {
+    "cookie": "ddos-blocked-times=21",
     "x-forwarded-for": "77.11.107.51",
   },
   "hostname": "http://localhost",

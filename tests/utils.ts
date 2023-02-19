@@ -5,7 +5,7 @@ export const cookies: { [key: string]: any } = {};
 export const cookieOptions: { [key: string]: any } = {};
 
 export const request = { 
-    headers: { 'x-forwarded-for': '41.125.107.17, 172.20.235.47, 11.204.123.255, 19.203.151.141' }, 
+    headers: { 'x-forwarded-for': '41.125.107.17, 172.20.235.47, 11.204.123.255, 19.203.151.141', cookie: '' }, 
     path: '/index', 
     method: 'GET',
     protocol: 'http',

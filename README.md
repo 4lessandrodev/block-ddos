@@ -114,4 +114,4 @@ app.use(blockDDoS({ attempts }));
 
 ## ban IP
 
-If the ip is blocked seven (7) times for the same route in a 10 minutes interval, it will be banned for 10 minutes
+If the ip is blocked twenty (20) times for the same route in a 10 minutes interval, it will be banned for 10 minutes
