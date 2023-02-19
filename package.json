@@ -1,6 +1,6 @@
 {
 	"name": "block-ddos",
-	"version": "0.1.1-test.0",
+	"version": "0.1.1-test.1",
 	"description": "This package provide a middleware to block multiple request",
 	"main": "index.js",
 	"types": "index.js",

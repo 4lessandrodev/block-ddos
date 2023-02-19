@@ -237,8 +237,8 @@ const ValidateParams = (params?: Params): void => {
 export const blockDDoS = (params?: Params): Middleware => {
 	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
-		const hasTries = req.cookies?.['ddos-blocked-times'] as number | undefined;
-		if(hasTries && !isNaN(+String(hasTries)) && +String(hasTries) >= 7) {
+		const maybeTotal = req.headers?.cookie?.split(';').find((a): boolean => a?.includes('ddos-blocked-times='))?.split("=")?.[1]
+		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 7) {
 			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
 		}
 		const store = MemoryStore.Create(params?.attempts);
@@ -247,7 +247,7 @@ export const blockDDoS = (params?: Params): Middleware => {
 		const canAccess = store.CanAccess(hash);
 		if (!canAccess) {
 			const TEN_MIN = 1000 * 60 * 10;
-			const tries =  (hasTries && !isNaN(+String(hasTries))) ? +String(hasTries) + 1 : 1;
+			const tries =  (maybeTotal && !isNaN(+String(maybeTotal))) ? +String(maybeTotal) + 1 : 1;
 			const secure = req?.protocol === 'https' || req?.protocol === 'https:';
 			const expires = new Date(Date.now() + TEN_MIN);
 			const options = { expires, httpOnly: true, domain: req.hostname, secure, path: req.path };
