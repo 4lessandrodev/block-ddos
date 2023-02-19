@@ -59,7 +59,9 @@ class Info implements Data {
 	 * @returns ip as string.
 	 */
 	private static GetIP(request: Requests): string {
-		const ip = request.socket?.remoteAddress ?? request.headers['x-forwarded-for'] as string ?? request?.ip;
+		const headersIp = request?.headers['x-forwarded-for'];
+		const ipStr = Array.isArray(headersIp) ? headersIp.toString() : headersIp ?? '';
+		const ip = ipStr?.replace(/\s/g, '')?.split(',')?.[0] ?? request?.ip ?? request.socket?.remoteAddress;
 		return (ip === '::1') ? '127.0.0.1' : ip ?? '0.0.0.0';
 	}
 }
@@ -77,7 +79,7 @@ class MemoryStore {
 
 	private constructor (attempts: number) {
 		this.Db = [];
-		this.interval = 5000;
+		this.interval = 10000;
 		this.attempts = attempts;
 		this.timer = null;
 		this.StartTimerCaseData();
@@ -88,7 +90,7 @@ class MemoryStore {
 	 * @param interval time in milliseconds to expires data in store.
 	 * @returns instance of MemoryStore.
 	 */
-	public static Create(attempts = 3): MemoryStore {		
+	public static Create(attempts = 2): MemoryStore {		
 		if (MemoryStore.instance) return MemoryStore.instance;
 		MemoryStore.instance = new MemoryStore(attempts);
 		return MemoryStore.instance;
@@ -213,7 +215,7 @@ class MemoryStore {
 const ValidateParams = (params?: Params): void => {
 	if (params && params?.attempts && typeof params.attempts !== 'number') throw new Error('The attempts param must be a positive number');
 	if (params && params?.interval && typeof params.interval !== 'number') throw new Error('The time interval must be a number');
-	if (params && params?.interval && params.interval < 5000) throw new Error('The time interval must be greater than or equal to 5000ms');
+	if (params && params?.interval && params.interval < 10000) throw new Error('The time interval must be greater than or equal to 10000ms');
 	if(typeof params?.attempts === 'number' && (params.attempts < 1 || params.attempts > 7)) throw new Error('The attempts param must be between 0 and 8') ;
 };
 
@@ -227,19 +229,31 @@ const ValidateParams = (params?: Params): void => {
  *
  * @default interval `10000` = `10 sec`
  * @default error { message: `Blocked by proxy. Try again in a moment!` }
- * @default attempts 3
+ * @default attempts 2
  * @throws if provide interval as not a number
- * @throws if provide interval less than 5000ms or 5 sec
+ * @throws if provide interval less than 10000ms or 10 sec
  * @throws if provide attempts less than 1 or greater than 7.
  */
 export const blockDDoS = (params?: Params): Middleware => {
 	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
+		const hasTries = req.cookies?.['ddos-blocked-times'] as number | undefined;
+		if(hasTries && !isNaN(+String(hasTries)) && +String(hasTries) >= 7) {
+			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
+		}
 		const store = MemoryStore.Create(params?.attempts);
 		const info = Info.Create(req, params?.interval);
 		const hash = Info.GetHash(req);
 		const canAccess = store.CanAccess(hash);
-		if (!canAccess) return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
+		if (!canAccess) {
+			const TEN_MIN = 1000 * 60 * 10;
+			const tries =  (hasTries && !isNaN(+String(hasTries))) ? +String(hasTries) + 1 : 1;
+			const secure = req?.protocol === 'https' || req?.protocol === 'https:';
+			const expires = new Date(Date.now() + TEN_MIN);
+			const options = { expires, httpOnly: true, domain: req.hostname, secure, path: req.path };
+			res.cookie('ddos-blocked-times', tries, options);
+			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
+		}
 		store.Save(info);
 		return next();
 	};

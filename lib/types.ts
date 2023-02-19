@@ -26,7 +26,7 @@ export type Get = { data: Readonly<Data>; index: number; } | null;
  * @default error { message: `Blocked by proxy. Try again in a moment!` }
  * @default attempts 3
  * @throws if provide interval as not a number
- * @throws if provide interval less than 5000ms or 5 sec
+ * @throws if provide interval less than 10000ms or 10 sec
  * @throws if provide attempts less than 1 or greater than 7.
  */
 export interface Params {

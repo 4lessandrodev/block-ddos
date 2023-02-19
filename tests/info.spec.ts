@@ -23,7 +23,7 @@ describe('info', () => {
 
     it('should allow request for another ip', () => {
         const middleware = ddosMiddleware();
-        const req = Object.assign({}, { ...request }, { socket: { remoteAddress: '157.237.150.27' } }) as Request;
+        const req = Object.assign({}, { ...request }, { headers: { 'x-forwarded-for': '41.125.107.18' } }) as unknown as Request;
         middleware(req, response, next);
         expect(result).toEqual({ status: 200, data: { next: true } });
     })
@@ -35,7 +35,7 @@ describe('info', () => {
 
     it('should throws if provide a time less than 5000ms', () => {
         const fn = () => blockDDoS({ interval: 4000 });
-        expect(fn).toThrowError('The time interval must be greater than or equal to 5000ms');
+        expect(fn).toThrowError('The time interval must be greater than or equal to 10000ms');
     });
 
     it('should throws if provide negative', () => {
