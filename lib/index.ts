@@ -237,8 +237,7 @@ const ValidateParams = (params?: Params): void => {
 export const blockDDoS = (params?: Params): Middleware => {
 	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
-		const isHTTP = typeof req?.protocol === 'string' && req.protocol.includes('http');
-		if(req?.path === '/favicon.ico' || !isHTTP) return next();
+		if(req?.path === '/favicon.ico' || !req.protocol.includes('http')) return next();
 		const maybeTotal = req.headers?.cookie?.split(';')?.find((c): boolean => c?.includes('ddos-blocked-times='))?.split("=")?.[1]
 		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 20) {
 			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
@@ -248,9 +247,11 @@ export const blockDDoS = (params?: Params): Middleware => {
 		const hash = Info.GetHash(req);
 		const canAccess = store.CanAccess(hash);
 		if (!canAccess) {
+			const hasProtocol = req?.headers?.['x-forwarded-proto'] ?? '';
+			const isHTTPS = hasProtocol.includes('https');
 			const TEN_MIN = 1000 * 60 * 10;
 			const tries =  (maybeTotal && !isNaN(+String(maybeTotal))) ? +String(maybeTotal) + 1 : 1;
-			const secure = isHTTP && req.protocol.includes('https');
+			const secure = isHTTPS && hasProtocol.includes('https');
 			const maxAge = TEN_MIN;
 			const options = { maxAge, httpOnly: true, domain: req.hostname, secure, path: req.path };
 			res.cookie('ddos-blocked-times', tries, options);
