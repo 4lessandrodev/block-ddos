@@ -1,6 +1,16 @@
 # block-ddos
 
-Lib to block multiple request for a route in a short interval from same ip addr.
+A middleware function for a Node.js web application that helps prevent **distributed denial-of-service (DDoS) attacks**. When a client makes a request to the application, the middleware function is called to check if the request is legitimate or not based on the number of requests made within a certain time period.
+
+The function first checks if the request is an `HTTP` request and not for the `/favicon.ico file`. If it is not an **HTTP request** or for the /favicon.ico file, the function passes control to the next middleware function in the chain.
+
+If the request is an HTTP request and not for the /favicon.ico file, the function checks if the client has made too many requests by checking if the client's browser has stored a cookie named `"ddos-blocked-times"` with a value of 20 or more. If the client has made too many requests, the function returns an HTTP 403 error with a JSON object containing an error message.
+
+If the client has not made too many requests, the function creates an instance of a memory store, which stores information about requests made by clients. The function then creates an instance of an Info object, which contains information about the client's request, such as the client's IP address, user agent, and timestamp.
+
+The function generates a hash code for the Info object and checks if the client has made too many requests by calling the CanAccess method of the MemoryStore object. **If the client has made too many requests, the function returns an HTTP 403 error with a JSON object containing an error message**.
+
+If the client has not made too many requests, the function saves the Info object to the MemoryStore object and passes control to the next middleware function in the chain.
 
 ---
 
@@ -97,7 +107,7 @@ app.use(blockDDoS({ interval, error }));
 ```
 
 
-## Allow some retry
+## Allow retry
 
 You can allow user retry some request before block it. In this example the 3th request for same endpoint from the same ip will be blocked on default interval: `10sec`
 
@@ -112,6 +122,23 @@ app.use(blockDDoS({ attempts }));
 
 ```
 
+---
+
 ## Ban IP
 
-If the ip is blocked twenty (20) times for the same route in a 10 minutes interval, it will be banned for 10 minutes
+If the ip is blocked **twenty (20) times** for the same route in a 10 minutes interval, it will be banned for 10 minutes
+
+---
+## Error Payload
+
+The content below is sent to user.
+
+```json
+// Status Code 403
+{
+  "error": {
+    "message": "Blocked by proxy. Try again in a moment!"
+  }
+}
+
+```
