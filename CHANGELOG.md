@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### [0.1.2] - 2023-02-20
+
+### Fix
+
+- Fix: cookies set expiration as maxAge instead expires as Date
+- Fix: ensure set secure cookie for https
+
+---
+
 ### [0.1.1] - 2023-02-19
 ### Fix
 

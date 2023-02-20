@@ -59,8 +59,8 @@ class Info implements Data {
 	 * @returns ip as string.
 	 */
 	private static GetIP(request: Requests): string {
-		const headersIp = request?.headers['x-forwarded-for'];
-		const ipStr = Array.isArray(headersIp) ? headersIp.toString() : headersIp ?? '';
+		const headersIp = request?.headers?.['x-forwarded-for'] ?? '';
+		const ipStr = Array.isArray(headersIp) ? headersIp.toString() : headersIp;
 		const ip = ipStr?.replace(/\s/g, '')?.split(',')?.[0] ?? request?.ip ?? request.socket?.remoteAddress;
 		return (ip === '::1') ? '127.0.0.1' : ip ?? '0.0.0.0';
 	}
@@ -237,8 +237,9 @@ const ValidateParams = (params?: Params): void => {
 export const blockDDoS = (params?: Params): Middleware => {
 	ValidateParams(params);
 	return (req: Requests, res: Responses, next: NextFunctions): Payload => {
-		if(req?.path === '/favicon.ico') return next();
-		const maybeTotal = req.headers?.cookie?.split(';').find((c): boolean => c?.includes('ddos-blocked-times='))?.split("=")?.[1]
+		const isHTTP = typeof req?.protocol === 'string' && req.protocol.includes('http');
+		if(req?.path === '/favicon.ico' || !isHTTP) return next();
+		const maybeTotal = req.headers?.cookie?.split(';')?.find((c): boolean => c?.includes('ddos-blocked-times='))?.split("=")?.[1]
 		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 20) {
 			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
 		}
@@ -249,9 +250,9 @@ export const blockDDoS = (params?: Params): Middleware => {
 		if (!canAccess) {
 			const TEN_MIN = 1000 * 60 * 10;
 			const tries =  (maybeTotal && !isNaN(+String(maybeTotal))) ? +String(maybeTotal) + 1 : 1;
-			const secure = req?.protocol === 'https' || req?.protocol === 'https:';
-			const expires = new Date(Date.now() + TEN_MIN);
-			const options = { expires, httpOnly: true, domain: req.hostname, secure, path: req.path };
+			const secure = isHTTP && req.protocol.includes('https');
+			const maxAge = TEN_MIN;
+			const options = { maxAge, httpOnly: true, domain: req.hostname, secure, path: req.path };
 			res.cookie('ddos-blocked-times', tries, options);
 			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
 		}
