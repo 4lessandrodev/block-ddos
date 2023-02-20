@@ -133,8 +133,10 @@ If the ip is blocked **twenty (20) times** for the same route in a 10 minutes in
 
 The content below is sent to user.
 
+**Status Code 403**
+
 ```json
-// Status Code 403
+
 {
   "error": {
     "message": "Blocked by proxy. Try again in a moment!"
