@@ -48,7 +48,7 @@
 		"@types/jest": "^27.0.1",
 		"@types/node": "^20.2.5",
 		"jest": "^27.5.1",
-		"lint-staged": "^13.1.2",
+		"lint-staged": "^14.0.1",
 		"madge": "^6.0.0",
 		"prettier": "^2.8.1",
 		"rimraf": "^5.0.0",
