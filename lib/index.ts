@@ -72,7 +72,7 @@ class Info implements Data {
  */
 class MemoryStore {
 	private static instance: MemoryStore;
-	private timer: NodeJS.Timer | null;
+	private timer: NodeJS.Timeout | null;
 	private readonly interval: number;
 	private Db: Array<Readonly<Data>>;
 	private attempts: number;
@@ -200,7 +200,7 @@ class MemoryStore {
 	 * @returns instance of timer or null.
 	 * @summary Running as single event and only if exist data.
 	 */
-	private StartTimerCaseData(): NodeJS.Timer | null {
+	private StartTimerCaseData(): NodeJS.Timeout | null {
 		if (!this.HasData() || this.timer) return null;
 		const timer = setInterval((): void => { this.RemoveExpired(); }, this.interval);
 		this.timer = timer;
