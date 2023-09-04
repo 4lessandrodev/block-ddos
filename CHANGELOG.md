@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 ## Unreleased
 
 ---
+
+### [0.1.4] - 2023-08-04
+
+### Fix
+
+- Fix: update node/types and fix event type
+
+---
 ### [0.1.3] - 2023-02-20
 
 ### Fix
