@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-### [0.1.4] - 2023-02-04
+### [0.1.4] - 2023-08-04
 
 ### Fix
 
