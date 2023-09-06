@@ -240,7 +240,7 @@ export const blockDDoS = (params?: Params): Middleware => {
 		if(req?.path === '/favicon.ico' || !req.protocol.includes('http')) return next();
 		const maybeTotal = req.headers?.cookie?.split(';')?.find((c): boolean => c?.includes('ddos-blocked-times='))?.split("=")?.[1]
 		if(maybeTotal && !isNaN(+String(maybeTotal)) && +String(maybeTotal) >= 20) {
-			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
+			return res.status(429).json({ error: params?.error ?? { message: defaultMsg } });
 		}
 		const store = MemoryStore.Create(params?.attempts);
 		const info = Info.Create(req, params?.interval);
@@ -255,7 +255,7 @@ export const blockDDoS = (params?: Params): Middleware => {
 			const maxAge = TEN_MIN;
 			const options = { maxAge, httpOnly: true, domain: req.hostname, secure, path: req.path };
 			res.cookie('ddos-blocked-times', tries, options);
-			return res.status(403).json({ error: params?.error ?? { message: defaultMsg } });
+			return res.status(429).json({ error: params?.error ?? { message: defaultMsg } });
 		}
 		store.Save(info);
 		return next();
