@@ -4,7 +4,7 @@ A middleware function for a Node.js web application that helps prevent **distrib
 
 The function first checks if the request is an `HTTP` request and not for the `/favicon.ico file`. If it is not an **HTTP request** or for the /favicon.ico file, the function passes control to the next middleware function in the chain.
 
-If the request is an HTTP request and not for the /favicon.ico file, the function checks if the client has made too many requests by checking if the client's browser has stored a cookie named `"ddos-blocked-times"` with a value of 20 or more. If the client has made too many requests, the function returns an HTTP 403 error with a JSON object containing an error message.
+If the request is an HTTP request and not for the /favicon.ico file, the function checks if the client has made too many requests by checking if the client's browser has stored a cookie named `"ddos-blocked-times"` with a value of 20 or more. If the client has made too many requests, the function returns an HTTP 429 error with a JSON object containing an error message.
 
 If the client has not made too many requests, the function creates an instance of a memory store, which stores information about requests made by clients. The function then creates an instance of an Info object, which contains information about the client's request, such as the client's IP address, user agent, and timestamp.
 
@@ -133,7 +133,7 @@ If the ip is blocked **twenty (20) times** for the same route in a 10 minutes in
 
 The content below is sent to user.
 
-**Status Code 403**
+**Status Code 429**
 
 ```json
 

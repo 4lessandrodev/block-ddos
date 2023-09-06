@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+### [0.1.5] - 2023-09-06
+
+### Feat
+
+- Feat: change status code from 403 to 429
+
+---
+
 ### [0.1.4] - 2023-08-04
 
 ### Fix

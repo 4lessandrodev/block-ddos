@@ -18,7 +18,7 @@ describe('info', () => {
         middleware(request, response, next);
         middleware(request, response, next);
         middleware(request, response, next);
-        expect(result).toEqual({ status: 403, data: { error: { message: 'Blocked by proxy. Try again in a moment!' } } });
+        expect(result).toEqual({ status: 429, data: { error: { message: 'Blocked by proxy. Try again in a moment!' } } });
     });
 
     it('should allow request for another ip', () => {
