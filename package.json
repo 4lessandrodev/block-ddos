@@ -50,7 +50,7 @@
 		"babel-loader": "^9.1.2",
 		"jest": "^27.5.1",
 		"lint-staged": "^15.0.2",
-		"madge": "^6.0.0",
+		"madge": "^7.0.0",
 		"prettier": "^3.0.3",
 		"rimraf": "^5.0.0",
 		"ts-jest": "^27.1.4",
